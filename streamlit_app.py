@@ -10,9 +10,23 @@ from estimate import MLE
 
 st.title('Math CDA')
 
-model = ACDM(
-    slip=np.array([0.2] * 12),
-    guess=np.array([0.4] * 12)
+option = st.selectbox(
+    "Model",
+    ("ACDM", "DINA", "DINO"),
+)
+
+TargetModel = {
+    "DINA": DINA,
+    "DINO": DINO,
+    "ACDM": ACDM
+}[option]
+
+slip_val = st.slider("slip", 0.0, 0.5, 0.2, 0.05)
+guess_val = st.slider("guess", 0.0, 0.5, 0.4, 0.05)
+
+model = TargetModel(
+    slip=np.array([slip_val] * 12),
+    guess=np.array([guess_val] * 12)
 )
 
 with open("data/q_matrix.csv", "r") as f:
@@ -35,10 +49,15 @@ with open("data/q_matrix.csv", "r") as f:
 st.subheader("Q-Matrix")
 st.table(qm)
 
-checks = st.columns(12)
+checks = st.columns(6)
 l = []
-for i in range(12):
+for i in range(6):
     with checks[i]:
+        l.append(st.checkbox(str(i)))
+
+checks2 = st.columns(6)
+for i in range(6, 12):
+    with checks2[i - 6]:
         l.append(st.checkbox(str(i)))
 
 x = np.array([l])
